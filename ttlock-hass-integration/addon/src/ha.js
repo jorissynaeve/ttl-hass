@@ -39,7 +39,7 @@ class HomeAssistant {
       this.client.on("message", this._onMQTTMessage.bind(this));
       await this.client.subscribe("ttlock/+/set");
       this.connected = true;
-      console.log("MQTT connected 1");
+      console.log("MQTT connected 2");
     }
   }
 
@@ -202,6 +202,10 @@ class HomeAssistant {
      * Topic: ttlock/e1581b3a605e/set
        Message: UNLOCK
      */
+    console.log("V1");
+    console.log("Topic:", topic);
+    console.log("Message:", message.toString('utf8'));
+    
     let topicArr = topic.split("/");
     if (topicArr.length == 3 && topicArr[0] == "ttlock" && topicArr[2] == "set" && topicArr[1].length == 12) {
       let address = "";
