@@ -213,6 +213,7 @@ class HomeAssistant {
       }
       address = address.toUpperCase();
       const command = message.toString('utf8');
+      console.log("MQTT command:", address, command);
       if (process.env.MQTT_DEBUG == "1") {
         console.log("MQTT command:", address, command);
       }
