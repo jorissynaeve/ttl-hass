@@ -236,7 +236,16 @@ class HomeAssistant {
       const command = message.toString('utf8');
       
       console.log("MQTT code command:", address, command);
+      // zie addon/api/index.js
       //  manager.addPasscode(address, type, passCode, startDate, endDate)
+      const passcodes = await manager.getPasscodes(address);
+      if (passcodes !== false) {
+            await this.client.publish("ttlock/" + topicArr[1] + "/response", JSON.stringify({ status: "ok", data: passcodes }));
+      } else { // notify failure
+            await this.client.publish("ttlock/" + topicArr[1] + "/response", JSON.stringify({ status: "error", data: "Failed fetching PINs" }));
+      }
+
+      
       
     } else if (process.env.MQTT_DEBUG == "1") {
       console.log("Topic:", topic);
