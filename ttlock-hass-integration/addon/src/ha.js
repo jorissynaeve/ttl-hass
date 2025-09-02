@@ -213,7 +213,6 @@ class HomeAssistant {
       }
       address = address.toUpperCase();
       const command = message.toString('utf8');
-      console.log("MQTT command:", address, command);
       if (process.env.MQTT_DEBUG == "1") {
         console.log("MQTT command:", address, command);
       }
@@ -225,6 +224,20 @@ class HomeAssistant {
           manager.unlockLock(address);
           break;
       }
+    } else if (topicArr.length == 3 && topicArr[0] == "ttlock" && topicArr[2] == "passcode" && topicArr[1].length == 12) {
+      let address = "";
+      for (let i = 0; i < topicArr[1].length; i++) {
+        address += topicArr[1][i];
+        if (i < topicArr[1].length - 1 && i % 2 == 1) {
+          address += ":";
+        }
+      }
+      address = address.toUpperCase();
+      const command = message.toString('utf8');
+      
+      console.log("MQTT code command:", address, command);
+      //  manager.addPasscode(address, type, passCode, startDate, endDate)
+      
     } else if (process.env.MQTT_DEBUG == "1") {
       console.log("Topic:", topic);
       console.log("Message:", message.toString('utf8'));
