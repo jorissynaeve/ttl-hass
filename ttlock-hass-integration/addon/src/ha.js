@@ -197,7 +197,7 @@ class HomeAssistant {
    * @param {string} topic 
    * @param {Buffer} message 
    */
-  _onMQTTMessage(topic, message) {
+  async _onMQTTMessage(topic, message) {
     /**
      * Topic: ttlock/e1581b3a605e/set
        Message: UNLOCK
