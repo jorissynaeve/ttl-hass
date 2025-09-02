@@ -7,15 +7,7 @@ const store = require('../src/store');
 const Message = require("./Message");
 const WsApi = require("./WsApi");
 
-module.exports = async (server) => {
-  server.on("request", (req, res) => {
-    if (req.url === "/public" && req.method === "GET") {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ status: "ok", uptime: process.uptime() }));
-      return;
-    }
-  });
-  
+module.exports = async (server) => {  
   const wss = new WebSocket.Server({
     server: server,
     path: "/api"
