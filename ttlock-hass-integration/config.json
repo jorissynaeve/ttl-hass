@@ -15,6 +15,9 @@
   "ingress": true,
   "ingress_port": 55099,
   "ingress_entry": "frontend/",
+  "environment": {
+    "MQTT_DEBUG": "1"
+  },
   "services": [
     "mqtt:want"
   ],
