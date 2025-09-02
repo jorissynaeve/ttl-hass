@@ -235,7 +235,7 @@ class HomeAssistant {
       address = address.toUpperCase();
       const command = message.toString('utf8');
       
-      console.log("MQTT code command:", address, command);
+      console.log("MQTT passcode command v1:", address, command);
       // zie addon/api/index.js
       //  manager.addPasscode(address, type, passCode, startDate, endDate)
       const passcodes = await manager.getPasscodes(address);
