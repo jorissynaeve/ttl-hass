@@ -239,10 +239,11 @@ class HomeAssistant {
       }
       address = address.toUpperCase();
       const command = message.toString('utf8');
+      const commandJson = JSON.parse(command);
       
       console.log("MQTT passcode command v1:", address, command);
       // zie addon/api/index.js
-      //  manager.addPasscode(address, type, passCode, startDate, endDate)
+      //  manager.addPasscode(address, commandJson.type, commandJson.passcode, commandJson.startdate, commandJson.enddate)
       const passcodes = await manager.getPasscodes(address);
       if (passcodes !== false) {
             await this.client.publish("ttlock/" + topicArr[1] + "/response", JSON.stringify({ status: "ok", data: passcodes }));
