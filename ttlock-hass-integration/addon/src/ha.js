@@ -38,8 +38,9 @@ class HomeAssistant {
       });
       this.client.on("message", this._onMQTTMessage.bind(this));
       await this.client.subscribe("ttlock/+/set");
+      await this.client.subscribe("ttlock/+/passcode");
       this.connected = true;
-      console.log("MQTT connected 2");
+      console.log("MQTT connected 3");
     }
   }
 
