@@ -33,7 +33,11 @@ module.exports = async (server) => {
   wss.on('connection', (ws) => {
 
     console.log('Een client heeft verbinding gemaakt!');
-    sendStatusUpdate();
+    setTimeout(() => {
+        console.log("Zend eerste status naar client");
+        sendStatusUpdate();
+    }, 5000);
+    
     
     const api = new WsApi(ws);
 
