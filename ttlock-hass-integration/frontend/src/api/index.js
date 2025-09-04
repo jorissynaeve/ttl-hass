@@ -29,11 +29,21 @@ class Api {
 
   async connect() {
     if (typeof this.ws == "undefined") {
+      console.log("try connect websocket");
       this.ws = new ReconnectingWebSocket(this.url, [], {
         startClosed: true
       });
 
+      this.ws.addEventListener('open', () => {
+          console.log('De WebSocket connectie is gelukt!');
+      });
       this.ws.addEventListener("message", this._onMessage.bind(this));
+      this.ws.addEventListener('error', (err) => {
+          console.error('WebSocket fout:', err);
+      });
+      this.ws.addEventListener('close', () => {
+          console.log('De WebSocket is gesloten.');
+      });
     }
 
     this.ws.reconnect();
