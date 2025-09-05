@@ -231,7 +231,7 @@ class HomeAssistant {
       }
     } else if (topicArr.length == 3 && topicArr[0] == "ttlock" && topicArr[2] == "api" && topicArr[1].length == 12) {
 		
-		await _onMqttApi(topicArr[1], message.toString('utf8'));     
+		await this._onMqttApi(topicArr[1], message.toString('utf8'));     
       
     } else if (process.env.MQTT_DEBUG == "1") {
       console.log("Topic:", topic);
@@ -257,18 +257,18 @@ class HomeAssistant {
       //  manager.addPasscode(address, commandJson.type, commandJson.passcode, commandJson.startdate, commandJson.enddate)
 	  
 	  if (commandJson.type === "askPasscodes") {
-		  await sendPasscodes(lockId, address);
+		  await this.sendPasscodes(lockId, address);
 	  } else {
-		  await publishApiResponse(lockId, "error", "command", "Command failure");
+		  await this.publishApiResponse(lockId, "error", "command", "Command failure");
 	  }
   }
   
   async sendPasscodes(lockId, address) {
 	      const passcodes = await manager.getPasscodes(address);
 		  if (passcodes !== false) {
-			  await publishApiResponse(lockId, "ok", "passcodes", passcodes);
+			  await this.publishApiResponse(lockId, "ok", "passcodes", passcodes);
 		  } else { // notify failure
-			  await publishApiResponse(lockId, "error", "passcodes", "Failed fetching PINS");
+			  await this.publishApiResponse(lockId, "error", "passcodes", "Failed fetching PINS");
 		  }
   }
   
