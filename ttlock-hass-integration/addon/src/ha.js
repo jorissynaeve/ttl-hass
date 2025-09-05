@@ -253,17 +253,27 @@ class HomeAssistant {
 	  
 	  console.log("MQTT passcode command v1:", address, command);
 	  
-	  // zie addon/api/index.js
-      //  manager.addPasscode(address, commandJson.type, commandJson.passcode, commandJson.startdate, commandJson.enddate)
 	  
-	  if (commandJson.type === "askPasscodes") {
-		  await this.sendPasscodes(lockId, address);
+	  
+	  if (commandJson.type === "addPasscode") {
+		  await this.addPasscode(lockId, address, commandJson.type, commandJson.passcode, commandJson.startdate, commandJson.enddate);
+	  } else if (commandJson.type === "askPasscodes") {
+		  await this.askPasscodes(lockId, address);
 	  } else {
 		  await this.publishApiResponse(lockId, "error", "command", "Command failure");
 	  }
   }
   
-  async sendPasscodes(lockId, address) {
+  async addPasscode(lockId, address, type, passcode, startdate, enddate) {
+	  // zie addon/api/index.js
+	  const res = await manager.addPasscode(address, type, passcode, startdate, enddate);
+	  if (res) {
+		  await this.publishApiResponse(lockId, "ok", "addPasscode", res);
+	  } else {
+		  await this.publishApiResponse(lockId, "error", "addPasscode", "Failed adding PIN");
+	  }
+  }
+  async askPasscodes(lockId, address) {
 	      const passcodes = await manager.getPasscodes(address);
 		  if (passcodes !== false) {
 			  await this.publishApiResponse(lockId, "ok", "passcodes", passcodes);
