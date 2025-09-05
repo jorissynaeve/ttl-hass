@@ -180,7 +180,7 @@ class Api {
   async _onMessage(messageEvent) {
     try {
       const message = JSON.parse(messageEvent.data);
-      console.log("receive message": message);
+      console.log("receive message :" + message);
       if (message.type) {
         switch (message.type) {
           case "status":
