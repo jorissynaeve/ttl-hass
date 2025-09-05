@@ -38,7 +38,7 @@ class HomeAssistant {
       });
       this.client.on("message", this._onMQTTMessage.bind(this));
       await this.client.subscribe("ttlock/+/set");
-      await this.client.subscribe("ttlock/+/passcode");
+      await this.client.subscribe("ttlock/+/api");
       this.connected = true;
       console.log("MQTT connected 3");
     }
@@ -229,34 +229,51 @@ class HomeAssistant {
           manager.unlockLock(address);
           break;
       }
-    } else if (topicArr.length == 3 && topicArr[0] == "ttlock" && topicArr[2] == "passcode" && topicArr[1].length == 12) {
-      let address = "";
-      for (let i = 0; i < topicArr[1].length; i++) {
-        address += topicArr[1][i];
-        if (i < topicArr[1].length - 1 && i % 2 == 1) {
-          address += ":";
-        }
-      }
-      address = address.toUpperCase();
-      const command = message.toString('utf8');
-      const commandJson = JSON.parse(command);
-      
-      console.log("MQTT passcode command v1:", address, command);
-      // zie addon/api/index.js
-      //  manager.addPasscode(address, commandJson.type, commandJson.passcode, commandJson.startdate, commandJson.enddate)
-      const passcodes = await manager.getPasscodes(address);
-      if (passcodes !== false) {
-            await this.client.publish("ttlock/" + topicArr[1] + "/response", JSON.stringify({ status: "ok", data: passcodes }));
-      } else { // notify failure
-            await this.client.publish("ttlock/" + topicArr[1] + "/response", JSON.stringify({ status: "error", data: "Failed fetching PINs" }));
-      }
-
-      
+    } else if (topicArr.length == 3 && topicArr[0] == "ttlock" && topicArr[2] == "api" && topicArr[1].length == 12) {
+		
+		await _onMqttApi(topicArr[1], message.toString('utf8'));     
       
     } else if (process.env.MQTT_DEBUG == "1") {
       console.log("Topic:", topic);
       console.log("Message:", message.toString('utf8'));
     }
+  }
+  
+  async _onMqttApi(lockId, command) {
+	  let address = "";
+      for (let i = 0; i < lockId.length; i++) {
+        address += lockId[i];
+        if (i < lockId.length - 1 && i % 2 == 1) {
+          address += ":";
+        }
+      }
+      address = address.toUpperCase();
+	  const commandJson = JSON.parse(command);
+	  
+	  
+	  console.log("MQTT passcode command v1:", address, command);
+	  
+	  // zie addon/api/index.js
+      //  manager.addPasscode(address, commandJson.type, commandJson.passcode, commandJson.startdate, commandJson.enddate)
+	  
+	  if (commandJson.type === "askPasscodes") {
+		  await sendPasscodes(lockId, address);
+	  } else {
+		  await publishApiResponse(lockId, "error", "command", "Command failure");
+	  }
+  }
+  
+  async sendPasscodes(lockId, address) {
+	      const passcodes = await manager.getPasscodes(address);
+		  if (passcodes !== false) {
+			  await publishApiResponse(lockId, "ok", "passcodes", passcodes);
+		  } else { // notify failure
+			  await publishApiResponse(lockId, "error", "passcodes", "Failed fetching PINS");
+		  }
+  }
+  
+  async publishApiResponse(lockId, state, type, data) {
+	  await this.client.publish("ttlock/" + lockId + "/response", JSON.stringify({ status: state, date: new Date().toISOString(), type: type, data: data }));
   }
 }
 
