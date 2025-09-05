@@ -256,7 +256,7 @@ class HomeAssistant {
 	  
 	  
 	  if (commandJson.type === "addPasscode") {
-		  await this.addPasscode(lockId, address, commandJson.type, commandJson.passcode, commandJson.startdate, commandJson.enddate);
+		  await this.addPasscode(lockId, address, commandJson.timetype, commandJson.passcode, commandJson.startdate, commandJson.enddate);
 	  } else if (commandJson.type === "askPasscodes") {
 		  await this.askPasscodes(lockId, address);
 	  } else {
