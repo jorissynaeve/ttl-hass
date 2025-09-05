@@ -79,6 +79,7 @@ class Manager extends EventEmitter {
           // but useful for when websocket reconnects
           // disable it for now as the reconnection won't re-trigger ready
           // this.startScan(ScanType.AUTOMATIC);
+		  console.log("TTLockClient ready, start Monitoring");
           this.client.startMonitor();
         });
         this.client.on("foundLock", this._onFoundLock.bind(this));
@@ -604,23 +605,23 @@ class Manager extends EventEmitter {
     this.scanning = false;
     console.log("BLE Scan stopped");
     console.log("Refreshing paired locks");
-    for (let address of this.connectQueue) {
-      if (this.pairedLocks.has(address)) {
-        let lock = this.pairedLocks.get(address);
-        console.log("Auto connect to", address);
-        const result = await lock.connect();
+    for (let conLock of this.connectQueue) {
+      if (!this.pairedLocks.has(conLock.getAddress())) {
+        console.log("Auto connect to", conLock.getAddress());
+        const result = await conLock.connect();
         if (result === true) {
-          await lock.disconnect();
-          console.log("Successful connect attempt to paired lock", address);
-          this.connectQueue.delete(address);
+          await conLock.disconnect();
+          console.log("Successful connect attempt to paired lock", conLock.getAddress());
+          this.connectQueue.delete(conLock);
         } else {
-          console.log("Unsuccessful connect attempt to paired lock", address);
+          console.log("Unsuccessful connect attempt to paired lock", conLock.getAddress());
         }
       }
     }
 
     this.emit("scanStop");
     setTimeout(() => {
+		console.log("scan stopped: start Monitor");
       this.client.startMonitor();
     }, 200);
   }
@@ -644,12 +645,12 @@ class Manager extends EventEmitter {
             await this._processOperationLog(lock);
           } else {
             console.log("Unsuccessful connect attempt to paired lock", lock.getAddress());
-            this.connectQueue.add(lock.getAddress());
+            this.connectQueue.add(lock);
           }
           await lock.disconnect();
         } else {
           // add it to the connect queue
-          this.connectQueue.add(lock.getAddress());
+          this.connectQueue.add(lock);
         }
         listChanged = true;
       }
